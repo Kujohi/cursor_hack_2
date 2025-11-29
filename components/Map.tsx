@@ -40,6 +40,13 @@ const MapUpdater: React.FC<{ center: GeoLocation | null, reports: EmergencyRepor
   const map = useMap();
   
   useEffect(() => {
+    // Invalidate size to ensure map fills container properly
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+  }, [map]);
+  
+  useEffect(() => {
     // If a new report comes in (reports array changes and has length), fly to it
     if (reports.length > 0) {
       const latest = reports[0];
@@ -57,10 +64,19 @@ export const Map: React.FC<MapProps> = ({ userLocation, reports }) => {
   const center = userLocation || { lat: 34.0522, lng: -118.2437 }; // Default LA
 
   return (
-    <MapContainer center={[center.lat, center.lng]} zoom={13} scrollWheelZoom={true} className="w-full h-full z-0">
+    <MapContainer 
+      center={[center.lat, center.lng]} 
+      zoom={13} 
+      scrollWheelZoom={true} 
+      className="w-full h-full z-0"
+      style={{ width: '100%', height: '100%' }}
+    >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        maxZoom={19}
+        minZoom={1}
+        tileSize={256}
       />
       
       <MapUpdater center={userLocation} reports={reports} />
